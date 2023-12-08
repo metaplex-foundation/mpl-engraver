@@ -7,9 +7,9 @@ const programDir = path.join(__dirname, "..", "programs");
 
 generateIdl({
   generator: "shank",
-  programName: "mpl_project_name_program",
-  programId: "MyProgram1111111111111111111111111111111111",
+  programName: "mpl_engraver_program",
+  programId: "engrutYV21fUN2euLkKKwv3vCuVsHg1pBwfJUtKLmZ5",
   idlDir,
   binaryInstallDir,
-  programDir: path.join(programDir, "mpl-project-name"),
+  programDir: path.join(programDir, "mpl-engraver"),
 });

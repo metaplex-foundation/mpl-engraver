@@ -5,6 +5,6 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
-pub(crate) mod mpl_project_name;
+pub(crate) mod mpl_engraver;
 
-pub use self::mpl_project_name::MplProjectNameError;
+pub use self::mpl_engraver::MplEngraverError;

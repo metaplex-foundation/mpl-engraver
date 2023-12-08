@@ -1,5 +1,5 @@
 [package]
-name = "mpl-project-name-program"
+name = "mpl-engraver-program"
 version = "0.1.0"
 edition = "2021"
 readme = "./README.md"
@@ -11,8 +11,10 @@ crate-type = ["cdylib", "lib"]
 
 [dependencies]
 borsh = "^0.10"
-shank = "0.3.0"
-num-derive = "^0.3"
+mpl-token-metadata = "3.2.3"
+num-derive = "0.4.1"
 num-traits = "^0.2"
+shank = "0.3.0"
 solana-program = "~1.16"
+spl-token = { version = "4.0.0", features = ["no-entrypoint"] }
 thiserror = "^1.0"

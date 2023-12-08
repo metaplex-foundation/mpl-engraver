@@ -7,7 +7,6 @@
  */
 
 import {
-  ACCOUNT_HEADER_SIZE,
   Context,
   Pda,
   PublicKey,
@@ -17,13 +16,12 @@ import {
 } from '@metaplex-foundation/umi';
 import {
   Serializer,
+  bytes,
   mapSerializer,
   struct,
-  u16,
   u32,
   u8,
 } from '@metaplex-foundation/umi/serializers';
-import { getMyAccountSize } from '../accounts';
 import {
   ResolvedAccount,
   ResolvedAccountsWithIndices,
@@ -31,78 +29,79 @@ import {
 } from '../shared';
 
 // Accounts.
-export type CreateInstructionAccounts = {
-  /** The address of the new account */
-  address: Signer;
-  /** The authority of the new account */
-  authority?: PublicKey | Pda;
-  /** The account paying for the storage fees */
-  payer?: Signer;
-  /** The system program */
+export type EngraveInstructionAccounts = {
+  /** NFT update authority */
+  authority?: Signer;
+  /** NFT mint account */
+  mint: PublicKey | Pda;
+  /** NFT token account */
+  token: PublicKey | Pda;
+  /** NFT metadata account */
+  metadata: PublicKey | Pda;
+  /** NFT edition account */
+  edition: PublicKey | Pda;
+  /** System program */
   systemProgram?: PublicKey | Pda;
 };
 
 // Data.
-export type CreateInstructionData = {
+export type EngraveInstructionData = {
   discriminator: number;
-  arg1: number;
-  arg2: number;
+  args: Uint8Array;
 };
 
-export type CreateInstructionDataArgs = { arg1: number; arg2: number };
+export type EngraveInstructionDataArgs = { args: Uint8Array };
 
-export function getCreateInstructionDataSerializer(): Serializer<
-  CreateInstructionDataArgs,
-  CreateInstructionData
+export function getEngraveInstructionDataSerializer(): Serializer<
+  EngraveInstructionDataArgs,
+  EngraveInstructionData
 > {
-  return mapSerializer<CreateInstructionDataArgs, any, CreateInstructionData>(
-    struct<CreateInstructionData>(
+  return mapSerializer<EngraveInstructionDataArgs, any, EngraveInstructionData>(
+    struct<EngraveInstructionData>(
       [
         ['discriminator', u8()],
-        ['arg1', u16()],
-        ['arg2', u32()],
+        ['args', bytes({ size: u32() })],
       ],
-      { description: 'CreateInstructionData' }
+      { description: 'EngraveInstructionData' }
     ),
     (value) => ({ ...value, discriminator: 0 })
-  ) as Serializer<CreateInstructionDataArgs, CreateInstructionData>;
+  ) as Serializer<EngraveInstructionDataArgs, EngraveInstructionData>;
 }
 
 // Args.
-export type CreateInstructionArgs = CreateInstructionDataArgs;
+export type EngraveInstructionArgs = EngraveInstructionDataArgs;
 
 // Instruction.
-export function create(
-  context: Pick<Context, 'identity' | 'payer' | 'programs'>,
-  input: CreateInstructionAccounts & CreateInstructionArgs
+export function engrave(
+  context: Pick<Context, 'identity' | 'programs'>,
+  input: EngraveInstructionAccounts & EngraveInstructionArgs
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
-    'mplProjectName',
-    'MyProgram1111111111111111111111111111111111'
+    'mplEngraver',
+    'engrutYV21fUN2euLkKKwv3vCuVsHg1pBwfJUtKLmZ5'
   );
 
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
-    address: { index: 0, isWritable: true, value: input.address ?? null },
-    authority: { index: 1, isWritable: false, value: input.authority ?? null },
-    payer: { index: 2, isWritable: true, value: input.payer ?? null },
+    authority: { index: 0, isWritable: true, value: input.authority ?? null },
+    mint: { index: 1, isWritable: true, value: input.mint ?? null },
+    token: { index: 2, isWritable: true, value: input.token ?? null },
+    metadata: { index: 3, isWritable: true, value: input.metadata ?? null },
+    edition: { index: 4, isWritable: true, value: input.edition ?? null },
     systemProgram: {
-      index: 3,
+      index: 5,
       isWritable: false,
       value: input.systemProgram ?? null,
     },
   };
 
   // Arguments.
-  const resolvedArgs: CreateInstructionArgs = { ...input };
+  const resolvedArgs: EngraveInstructionArgs = { ...input };
 
   // Default values.
   if (!resolvedAccounts.authority.value) {
-    resolvedAccounts.authority.value = context.identity.publicKey;
-  }
-  if (!resolvedAccounts.payer.value) {
-    resolvedAccounts.payer.value = context.payer;
+    resolvedAccounts.authority.value = context.identity;
   }
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
@@ -125,12 +124,12 @@ export function create(
   );
 
   // Data.
-  const data = getCreateInstructionDataSerializer().serialize(
-    resolvedArgs as CreateInstructionDataArgs
+  const data = getEngraveInstructionDataSerializer().serialize(
+    resolvedArgs as EngraveInstructionDataArgs
   );
 
   // Bytes Created On Chain.
-  const bytesCreatedOnChain = getMyAccountSize() + ACCOUNT_HEADER_SIZE;
+  const bytesCreatedOnChain = 0;
 
   return transactionBuilder([
     { instruction: { keys, programId, data }, signers, bytesCreatedOnChain },

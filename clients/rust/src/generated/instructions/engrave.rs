@@ -9,53 +9,64 @@ use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
 /// Accounts.
-pub struct Create {
-    /// The address of the new account
-    pub address: solana_program::pubkey::Pubkey,
-    /// The authority of the new account
+pub struct Engrave {
+    /// NFT update authority
     pub authority: solana_program::pubkey::Pubkey,
-    /// The account paying for the storage fees
-    pub payer: solana_program::pubkey::Pubkey,
-    /// The system program
+    /// NFT mint account
+    pub mint: solana_program::pubkey::Pubkey,
+    /// NFT token account
+    pub token: solana_program::pubkey::Pubkey,
+    /// NFT metadata account
+    pub metadata: solana_program::pubkey::Pubkey,
+    /// NFT edition account
+    pub edition: solana_program::pubkey::Pubkey,
+    /// System program
     pub system_program: solana_program::pubkey::Pubkey,
 }
 
-impl Create {
+impl Engrave {
     pub fn instruction(
         &self,
-        args: CreateInstructionArgs,
+        args: EngraveInstructionArgs,
     ) -> solana_program::instruction::Instruction {
         self.instruction_with_remaining_accounts(args, &[])
     }
     #[allow(clippy::vec_init_then_push)]
     pub fn instruction_with_remaining_accounts(
         &self,
-        args: CreateInstructionArgs,
+        args: EngraveInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.address,
+            self.authority,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            self.authority,
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            self.mint, false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            self.token, false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            self.metadata,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            self.payer, true,
+            self.edition,
+            false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             self.system_program,
             false,
         ));
         accounts.extend_from_slice(remaining_accounts);
-        let mut data = CreateInstructionData::new().try_to_vec().unwrap();
+        let mut data = EngraveInstructionData::new().try_to_vec().unwrap();
         let mut args = args.try_to_vec().unwrap();
         data.append(&mut args);
 
         solana_program::instruction::Instruction {
-            program_id: crate::MPL_PROJECT_NAME_ID,
+            program_id: crate::MPL_ENGRAVER_ID,
             accounts,
             data,
         }
@@ -63,11 +74,11 @@ impl Create {
 }
 
 #[derive(BorshDeserialize, BorshSerialize)]
-struct CreateInstructionData {
+struct EngraveInstructionData {
     discriminator: u8,
 }
 
-impl CreateInstructionData {
+impl EngraveInstructionData {
     fn new() -> Self {
         Self { discriminator: 0 }
     }
@@ -75,60 +86,67 @@ impl CreateInstructionData {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct CreateInstructionArgs {
-    pub arg1: u16,
-    pub arg2: u32,
+pub struct EngraveInstructionArgs {
+    pub args: Vec<u8>,
 }
 
 /// Instruction builder.
 #[derive(Default)]
-pub struct CreateBuilder {
-    address: Option<solana_program::pubkey::Pubkey>,
+pub struct EngraveBuilder {
     authority: Option<solana_program::pubkey::Pubkey>,
-    payer: Option<solana_program::pubkey::Pubkey>,
+    mint: Option<solana_program::pubkey::Pubkey>,
+    token: Option<solana_program::pubkey::Pubkey>,
+    metadata: Option<solana_program::pubkey::Pubkey>,
+    edition: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
-    arg1: Option<u16>,
-    arg2: Option<u32>,
+    args: Option<Vec<u8>>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
-impl CreateBuilder {
+impl EngraveBuilder {
     pub fn new() -> Self {
         Self::default()
     }
-    /// The address of the new account
-    #[inline(always)]
-    pub fn address(&mut self, address: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.address = Some(address);
-        self
-    }
-    /// The authority of the new account
+    /// NFT update authority
     #[inline(always)]
     pub fn authority(&mut self, authority: solana_program::pubkey::Pubkey) -> &mut Self {
         self.authority = Some(authority);
         self
     }
-    /// The account paying for the storage fees
+    /// NFT mint account
     #[inline(always)]
-    pub fn payer(&mut self, payer: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.payer = Some(payer);
+    pub fn mint(&mut self, mint: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.mint = Some(mint);
+        self
+    }
+    /// NFT token account
+    #[inline(always)]
+    pub fn token(&mut self, token: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.token = Some(token);
+        self
+    }
+    /// NFT metadata account
+    #[inline(always)]
+    pub fn metadata(&mut self, metadata: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.metadata = Some(metadata);
+        self
+    }
+    /// NFT edition account
+    #[inline(always)]
+    pub fn edition(&mut self, edition: solana_program::pubkey::Pubkey) -> &mut Self {
+        self.edition = Some(edition);
         self
     }
     /// `[optional account, default to '11111111111111111111111111111111']`
-    /// The system program
+    /// System program
     #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_program::pubkey::Pubkey) -> &mut Self {
         self.system_program = Some(system_program);
         self
     }
     #[inline(always)]
-    pub fn arg1(&mut self, arg1: u16) -> &mut Self {
-        self.arg1 = Some(arg1);
-        self
-    }
-    #[inline(always)]
-    pub fn arg2(&mut self, arg2: u32) -> &mut Self {
-        self.arg2 = Some(arg2);
+    pub fn args(&mut self, args: Vec<u8>) -> &mut Self {
+        self.args = Some(args);
         self
     }
     /// Add an aditional account to the instruction.
@@ -151,62 +169,73 @@ impl CreateBuilder {
     }
     #[allow(clippy::clone_on_copy)]
     pub fn instruction(&self) -> solana_program::instruction::Instruction {
-        let accounts = Create {
-            address: self.address.expect("address is not set"),
+        let accounts = Engrave {
             authority: self.authority.expect("authority is not set"),
-            payer: self.payer.expect("payer is not set"),
+            mint: self.mint.expect("mint is not set"),
+            token: self.token.expect("token is not set"),
+            metadata: self.metadata.expect("metadata is not set"),
+            edition: self.edition.expect("edition is not set"),
             system_program: self
                 .system_program
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
-        let args = CreateInstructionArgs {
-            arg1: self.arg1.clone().expect("arg1 is not set"),
-            arg2: self.arg2.clone().expect("arg2 is not set"),
+        let args = EngraveInstructionArgs {
+            args: self.args.clone().expect("args is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
     }
 }
 
-/// `create` CPI accounts.
-pub struct CreateCpiAccounts<'a, 'b> {
-    /// The address of the new account
-    pub address: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The authority of the new account
+/// `engrave` CPI accounts.
+pub struct EngraveCpiAccounts<'a, 'b> {
+    /// NFT update authority
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account paying for the storage fees
-    pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The system program
+    /// NFT mint account
+    pub mint: &'b solana_program::account_info::AccountInfo<'a>,
+    /// NFT token account
+    pub token: &'b solana_program::account_info::AccountInfo<'a>,
+    /// NFT metadata account
+    pub metadata: &'b solana_program::account_info::AccountInfo<'a>,
+    /// NFT edition account
+    pub edition: &'b solana_program::account_info::AccountInfo<'a>,
+    /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
 }
 
-/// `create` CPI instruction.
-pub struct CreateCpi<'a, 'b> {
+/// `engrave` CPI instruction.
+pub struct EngraveCpi<'a, 'b> {
     /// The program to invoke.
     pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The address of the new account
-    pub address: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The authority of the new account
+    /// NFT update authority
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The account paying for the storage fees
-    pub payer: &'b solana_program::account_info::AccountInfo<'a>,
-    /// The system program
+    /// NFT mint account
+    pub mint: &'b solana_program::account_info::AccountInfo<'a>,
+    /// NFT token account
+    pub token: &'b solana_program::account_info::AccountInfo<'a>,
+    /// NFT metadata account
+    pub metadata: &'b solana_program::account_info::AccountInfo<'a>,
+    /// NFT edition account
+    pub edition: &'b solana_program::account_info::AccountInfo<'a>,
+    /// System program
     pub system_program: &'b solana_program::account_info::AccountInfo<'a>,
     /// The arguments for the instruction.
-    pub __args: CreateInstructionArgs,
+    pub __args: EngraveInstructionArgs,
 }
 
-impl<'a, 'b> CreateCpi<'a, 'b> {
+impl<'a, 'b> EngraveCpi<'a, 'b> {
     pub fn new(
         program: &'b solana_program::account_info::AccountInfo<'a>,
-        accounts: CreateCpiAccounts<'a, 'b>,
-        args: CreateInstructionArgs,
+        accounts: EngraveCpiAccounts<'a, 'b>,
+        args: EngraveInstructionArgs,
     ) -> Self {
         Self {
             __program: program,
-            address: accounts.address,
             authority: accounts.authority,
-            payer: accounts.payer,
+            mint: accounts.mint,
+            token: accounts.token,
+            metadata: accounts.metadata,
+            edition: accounts.edition,
             system_program: accounts.system_program,
             __args: args,
         }
@@ -244,18 +273,26 @@ impl<'a, 'b> CreateCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.address.key,
+            *self.authority.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            *self.authority.key,
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            *self.mint.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.payer.key,
-            true,
+            *self.token.key,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            *self.metadata.key,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            *self.edition.key,
+            false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             *self.system_program.key,
@@ -268,20 +305,22 @@ impl<'a, 'b> CreateCpi<'a, 'b> {
                 is_writable: remaining_account.2,
             })
         });
-        let mut data = CreateInstructionData::new().try_to_vec().unwrap();
+        let mut data = EngraveInstructionData::new().try_to_vec().unwrap();
         let mut args = self.__args.try_to_vec().unwrap();
         data.append(&mut args);
 
         let instruction = solana_program::instruction::Instruction {
-            program_id: crate::MPL_PROJECT_NAME_ID,
+            program_id: crate::MPL_ENGRAVER_ID,
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(4 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(6 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
-        account_infos.push(self.address.clone());
         account_infos.push(self.authority.clone());
-        account_infos.push(self.payer.clone());
+        account_infos.push(self.mint.clone());
+        account_infos.push(self.token.clone());
+        account_infos.push(self.metadata.clone());
+        account_infos.push(self.edition.clone());
         account_infos.push(self.system_program.clone());
         remaining_accounts
             .iter()
@@ -295,35 +334,27 @@ impl<'a, 'b> CreateCpi<'a, 'b> {
     }
 }
 
-/// `create` CPI instruction builder.
-pub struct CreateCpiBuilder<'a, 'b> {
-    instruction: Box<CreateCpiBuilderInstruction<'a, 'b>>,
+/// `engrave` CPI instruction builder.
+pub struct EngraveCpiBuilder<'a, 'b> {
+    instruction: Box<EngraveCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> CreateCpiBuilder<'a, 'b> {
+impl<'a, 'b> EngraveCpiBuilder<'a, 'b> {
     pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-        let instruction = Box::new(CreateCpiBuilderInstruction {
+        let instruction = Box::new(EngraveCpiBuilderInstruction {
             __program: program,
-            address: None,
             authority: None,
-            payer: None,
+            mint: None,
+            token: None,
+            metadata: None,
+            edition: None,
             system_program: None,
-            arg1: None,
-            arg2: None,
+            args: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
     }
-    /// The address of the new account
-    #[inline(always)]
-    pub fn address(
-        &mut self,
-        address: &'b solana_program::account_info::AccountInfo<'a>,
-    ) -> &mut Self {
-        self.instruction.address = Some(address);
-        self
-    }
-    /// The authority of the new account
+    /// NFT update authority
     #[inline(always)]
     pub fn authority(
         &mut self,
@@ -332,13 +363,37 @@ impl<'a, 'b> CreateCpiBuilder<'a, 'b> {
         self.instruction.authority = Some(authority);
         self
     }
-    /// The account paying for the storage fees
+    /// NFT mint account
     #[inline(always)]
-    pub fn payer(&mut self, payer: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
-        self.instruction.payer = Some(payer);
+    pub fn mint(&mut self, mint: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+        self.instruction.mint = Some(mint);
         self
     }
-    /// The system program
+    /// NFT token account
+    #[inline(always)]
+    pub fn token(&mut self, token: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
+        self.instruction.token = Some(token);
+        self
+    }
+    /// NFT metadata account
+    #[inline(always)]
+    pub fn metadata(
+        &mut self,
+        metadata: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.metadata = Some(metadata);
+        self
+    }
+    /// NFT edition account
+    #[inline(always)]
+    pub fn edition(
+        &mut self,
+        edition: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.edition = Some(edition);
+        self
+    }
+    /// System program
     #[inline(always)]
     pub fn system_program(
         &mut self,
@@ -348,13 +403,8 @@ impl<'a, 'b> CreateCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn arg1(&mut self, arg1: u16) -> &mut Self {
-        self.instruction.arg1 = Some(arg1);
-        self
-    }
-    #[inline(always)]
-    pub fn arg2(&mut self, arg2: u32) -> &mut Self {
-        self.instruction.arg2 = Some(arg2);
+    pub fn args(&mut self, args: Vec<u8>) -> &mut Self {
+        self.instruction.args = Some(args);
         self
     }
     /// Add an additional account to the instruction.
@@ -398,18 +448,21 @@ impl<'a, 'b> CreateCpiBuilder<'a, 'b> {
         &self,
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
-        let args = CreateInstructionArgs {
-            arg1: self.instruction.arg1.clone().expect("arg1 is not set"),
-            arg2: self.instruction.arg2.clone().expect("arg2 is not set"),
+        let args = EngraveInstructionArgs {
+            args: self.instruction.args.clone().expect("args is not set"),
         };
-        let instruction = CreateCpi {
+        let instruction = EngraveCpi {
             __program: self.instruction.__program,
-
-            address: self.instruction.address.expect("address is not set"),
 
             authority: self.instruction.authority.expect("authority is not set"),
 
-            payer: self.instruction.payer.expect("payer is not set"),
+            mint: self.instruction.mint.expect("mint is not set"),
+
+            token: self.instruction.token.expect("token is not set"),
+
+            metadata: self.instruction.metadata.expect("metadata is not set"),
+
+            edition: self.instruction.edition.expect("edition is not set"),
 
             system_program: self
                 .instruction
@@ -424,14 +477,15 @@ impl<'a, 'b> CreateCpiBuilder<'a, 'b> {
     }
 }
 
-struct CreateCpiBuilderInstruction<'a, 'b> {
+struct EngraveCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
-    address: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    payer: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    mint: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    token: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    metadata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    edition: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    arg1: Option<u16>,
-    arg2: Option<u32>,
+    args: Option<Vec<u8>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,

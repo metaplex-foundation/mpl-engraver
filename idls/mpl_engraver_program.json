@@ -1,0 +1,102 @@
+{
+  "version": "0.1.0",
+  "name": "mpl_engraver_program",
+  "instructions": [
+    {
+      "name": "Engrave",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "NFT update authority"
+          ]
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NFT mint account"
+          ]
+        },
+        {
+          "name": "token",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NFT token account"
+          ]
+        },
+        {
+          "name": "metadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NFT metadata account"
+          ]
+        },
+        {
+          "name": "edition",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "NFT edition account"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "System program"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": "bytes"
+        }
+      ],
+      "discriminant": {
+        "type": "u8",
+        "value": 0
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 0,
+      "name": "InvalidInstruction",
+      "msg": "Invalid Instruction"
+    },
+    {
+      "code": 1,
+      "name": "InvalidAccountOwner",
+      "msg": "Invalid Account owner"
+    },
+    {
+      "code": 2,
+      "name": "MintMetadataMismatch",
+      "msg": "The mint does not match the metadata account"
+    },
+    {
+      "code": 3,
+      "name": "MintTokenMismatch",
+      "msg": "The mint does not match the token account"
+    },
+    {
+      "code": 4,
+      "name": "EditionSupplyMismatch",
+      "msg": "The edition supply is not zero"
+    }
+  ],
+  "metadata": {
+    "origin": "shank",
+    "address": "engrutYV21fUN2euLkKKwv3vCuVsHg1pBwfJUtKLmZ5",
+    "binaryVersion": "0.3.0",
+    "libVersion": "0.3.0"
+  }
+}
