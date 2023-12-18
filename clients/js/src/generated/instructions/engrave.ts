@@ -27,6 +27,11 @@ import {
   ResolvedAccountsWithIndices,
   getAccountMetasAndSigners,
 } from '../shared';
+import {
+  EngraveTarget,
+  EngraveTargetArgs,
+  getEngraveTargetSerializer,
+} from '../types';
 
 // Accounts.
 export type EngraveInstructionAccounts = {
@@ -47,10 +52,14 @@ export type EngraveInstructionAccounts = {
 // Data.
 export type EngraveInstructionData = {
   discriminator: number;
-  args: Uint8Array;
+  target: EngraveTarget;
+  data: Uint8Array;
 };
 
-export type EngraveInstructionDataArgs = { args: Uint8Array };
+export type EngraveInstructionDataArgs = {
+  target: EngraveTargetArgs;
+  data: Uint8Array;
+};
 
 export function getEngraveInstructionDataSerializer(): Serializer<
   EngraveInstructionDataArgs,
@@ -60,7 +69,8 @@ export function getEngraveInstructionDataSerializer(): Serializer<
     struct<EngraveInstructionData>(
       [
         ['discriminator', u8()],
-        ['args', bytes({ size: u32() })],
+        ['target', getEngraveTargetSerializer()],
+        ['data', bytes({ size: u32() })],
       ],
       { description: 'EngraveInstructionData' }
     ),

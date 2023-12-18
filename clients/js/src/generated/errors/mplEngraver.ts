@@ -84,7 +84,7 @@ nameToErrorMap.set('EditionSupplyMismatch', EditionSupplyMismatchError);
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  */
-export function getMplMplEngraverErrorFromCode(
+export function getMplEngraverErrorFromCode(
   code: number,
   program: Program,
   cause?: Error
@@ -97,7 +97,7 @@ export function getMplMplEngraverErrorFromCode(
  * Attempts to resolve a custom program error from the provided error name, i.e. 'Unauthorized'.
  * @category Errors
  */
-export function getMplMplEngraverErrorFromName(
+export function getMplEngraverErrorFromName(
   name: string,
   program: Program,
   cause?: Error

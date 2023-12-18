@@ -45,9 +45,6 @@ fn process_engrave<'a>(accounts: &'a [AccountInfo<'a>], args: EngraveArgs) -> Pr
     msg!("Checking authority is signer");
     assert_signer(&authority_info)?;
 
-    // Asserter::owned_by(&metadata_info)?;
-    // Asserter::owned_by(edition_info)?;
-    // Asserter::is_metadata_account(&metadata_info, mint_info.key)?;
     assert_derivation(
         &mpl_token_metadata::ID,
         &metadata_info,
@@ -58,7 +55,6 @@ fn process_engrave<'a>(accounts: &'a [AccountInfo<'a>], args: EngraveArgs) -> Pr
         ],
         MplEngraverError::InvalidAccountOwner,
     )?;
-    // Asserter::is_edition_account(&edition_info, mint_info.key)?;
     assert_derivation(
         &mpl_token_metadata::ID,
         &metadata_info,
@@ -126,16 +122,24 @@ fn process_engrave<'a>(accounts: &'a [AccountInfo<'a>], args: EngraveArgs) -> Pr
     // TODO: Checks: The rest of the owl
 
     msg!("Writing metadata under the new owning program...");
-    // Set the metadata under the new owner, now it cannot be modified by Token Metadata any more.
-    // let mut bytes = Vec::with_capacity(MAX_METADATA_LEN);
 
-    // BorshSerialize::serialize(&nft_metadata, &mut bytes)?;
-    // args.data[..bytes.len()].copy_from_slice(&bytes);
-    sol_memcpy(
-        &mut metadata_info.data.borrow_mut(),
-        &serialized_data,
-        serialized_data.len(),
-    );
+    // Set the account under the new owner, now it cannot be modified by Token Metadata any more.
+    match args.target {
+        EngraveTarget::Metadata => {
+            sol_memcpy(
+                &mut metadata_info.data.borrow_mut(),
+                &serialized_data,
+                serialized_data.len(),
+            );
+        }
+        EngraveTarget::Edition => {
+            sol_memcpy(
+                &mut edition_info.data.borrow_mut(),
+                &serialized_data,
+                serialized_data.len(),
+            );
+        }
+    }
 
     Ok(())
 }

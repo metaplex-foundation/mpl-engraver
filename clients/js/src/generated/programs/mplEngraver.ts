@@ -13,8 +13,8 @@ import {
   PublicKey,
 } from '@metaplex-foundation/umi';
 import {
-  getMplMplEngraverErrorFromCode,
-  getMplMplEngraverErrorFromName,
+  getMplEngraverErrorFromCode,
+  getMplEngraverErrorFromName,
 } from '../errors';
 
 export const MPL_ENGRAVER_PROGRAM_ID =
@@ -25,10 +25,10 @@ export function createMplEngraverProgram(): Program {
     name: 'mplEngraver',
     publicKey: MPL_ENGRAVER_PROGRAM_ID,
     getErrorFromCode(code: number, cause?: Error) {
-      return getMplMplEngraverErrorFromCode(code, this, cause);
+      return getMplEngraverErrorFromCode(code, this, cause);
     },
     getErrorFromName(name: string, cause?: Error) {
-      return getMplMplEngraverErrorFromName(name, this, cause);
+      return getMplEngraverErrorFromName(name, this, cause);
     },
     isOnCluster() {
       return true;

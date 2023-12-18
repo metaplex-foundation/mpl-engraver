@@ -5,6 +5,7 @@
 //! [https://github.com/metaplex-foundation/kinobi]
 //!
 
+use crate::generated::types::EngraveTarget;
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 
@@ -87,7 +88,8 @@ impl EngraveInstructionData {
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EngraveInstructionArgs {
-    pub args: Vec<u8>,
+    pub target: EngraveTarget,
+    pub data: Vec<u8>,
 }
 
 /// Instruction builder.
@@ -99,7 +101,8 @@ pub struct EngraveBuilder {
     metadata: Option<solana_program::pubkey::Pubkey>,
     edition: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
-    args: Option<Vec<u8>>,
+    target: Option<EngraveTarget>,
+    data: Option<Vec<u8>>,
     __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
@@ -145,8 +148,13 @@ impl EngraveBuilder {
         self
     }
     #[inline(always)]
-    pub fn args(&mut self, args: Vec<u8>) -> &mut Self {
-        self.args = Some(args);
+    pub fn target(&mut self, target: EngraveTarget) -> &mut Self {
+        self.target = Some(target);
+        self
+    }
+    #[inline(always)]
+    pub fn data(&mut self, data: Vec<u8>) -> &mut Self {
+        self.data = Some(data);
         self
     }
     /// Add an aditional account to the instruction.
@@ -180,7 +188,8 @@ impl EngraveBuilder {
                 .unwrap_or(solana_program::pubkey!("11111111111111111111111111111111")),
         };
         let args = EngraveInstructionArgs {
-            args: self.args.clone().expect("args is not set"),
+            target: self.target.clone().expect("target is not set"),
+            data: self.data.clone().expect("data is not set"),
         };
 
         accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
@@ -349,7 +358,8 @@ impl<'a, 'b> EngraveCpiBuilder<'a, 'b> {
             metadata: None,
             edition: None,
             system_program: None,
-            args: None,
+            target: None,
+            data: None,
             __remaining_accounts: Vec::new(),
         });
         Self { instruction }
@@ -403,8 +413,13 @@ impl<'a, 'b> EngraveCpiBuilder<'a, 'b> {
         self
     }
     #[inline(always)]
-    pub fn args(&mut self, args: Vec<u8>) -> &mut Self {
-        self.instruction.args = Some(args);
+    pub fn target(&mut self, target: EngraveTarget) -> &mut Self {
+        self.instruction.target = Some(target);
+        self
+    }
+    #[inline(always)]
+    pub fn data(&mut self, data: Vec<u8>) -> &mut Self {
+        self.instruction.data = Some(data);
         self
     }
     /// Add an additional account to the instruction.
@@ -449,7 +464,8 @@ impl<'a, 'b> EngraveCpiBuilder<'a, 'b> {
         signers_seeds: &[&[&[u8]]],
     ) -> solana_program::entrypoint::ProgramResult {
         let args = EngraveInstructionArgs {
-            args: self.instruction.args.clone().expect("args is not set"),
+            target: self.instruction.target.clone().expect("target is not set"),
+            data: self.instruction.data.clone().expect("data is not set"),
         };
         let instruction = EngraveCpi {
             __program: self.instruction.__program,
@@ -485,7 +501,8 @@ struct EngraveCpiBuilderInstruction<'a, 'b> {
     metadata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     edition: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    args: Option<Vec<u8>>,
+    target: Option<EngraveTarget>,
+    data: Option<Vec<u8>>,
     /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
     __remaining_accounts: Vec<(
         &'b solana_program::account_info::AccountInfo<'a>,
