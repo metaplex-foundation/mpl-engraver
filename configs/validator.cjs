@@ -12,7 +12,7 @@ module.exports = {
     programs: [
       {
         label: "Mpl Engraver",
-        programId: "engrutYV21fUN2euLkKKwv3vCuVsHg1pBwfJUtKLmZ5",
+        programId: "ENGRVY4DL6uKDnNS91hCkJMwzTfcofYpkZH8zsgJfzA3",
         deployPath: getProgram("mpl_engraver_program.so"),
       },
       // Below are external programs that should be included in the local validator.

@@ -8,4 +8,4 @@
 use solana_program::{pubkey, pubkey::Pubkey};
 
 /// `mpl_engraver` program ID.
-pub const MPL_ENGRAVER_ID: Pubkey = pubkey!("engrutYV21fUN2euLkKKwv3vCuVsHg1pBwfJUtKLmZ5");
+pub const MPL_ENGRAVER_ID: Pubkey = pubkey!("ENGRVY4DL6uKDnNS91hCkJMwzTfcofYpkZH8zsgJfzA3");

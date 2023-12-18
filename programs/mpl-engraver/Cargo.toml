@@ -12,9 +12,10 @@ crate-type = ["cdylib", "lib"]
 [dependencies]
 borsh = "^0.10"
 mpl-token-metadata = "3.2.3"
+mpl-utils = "0.3.1"
 num-derive = "0.4.1"
 num-traits = "^0.2"
 shank = "0.3.0"
-solana-program = "~1.16"
+solana-program = "1.16.23"
 spl-token = { version = "4.0.0", features = ["no-entrypoint"] }
 thiserror = "^1.0"

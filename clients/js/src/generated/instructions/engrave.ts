@@ -79,7 +79,7 @@ export function engrave(
   // Program ID.
   const programId = context.programs.getPublicKey(
     'mplEngraver',
-    'engrutYV21fUN2euLkKKwv3vCuVsHg1pBwfJUtKLmZ5'
+    'ENGRVY4DL6uKDnNS91hCkJMwzTfcofYpkZH8zsgJfzA3'
   );
 
   // Accounts.

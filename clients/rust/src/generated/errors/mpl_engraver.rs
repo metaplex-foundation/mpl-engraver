@@ -9,7 +9,7 @@ use num_derive::FromPrimitive;
 use thiserror::Error;
 
 #[derive(Clone, Debug, Eq, Error, FromPrimitive, PartialEq)]
-pub enum MplEngraverError {
+pub enum MplMplEngraverError {
     /// 0 (0x0) - Invalid Instruction
     #[error("Invalid Instruction")]
     InvalidInstruction,
@@ -27,7 +27,7 @@ pub enum MplEngraverError {
     EditionSupplyMismatch,
 }
 
-impl solana_program::program_error::PrintProgramError for MplEngraverError {
+impl solana_program::program_error::PrintProgramError for MplMplEngraverError {
     fn print<E>(&self) {
         solana_program::msg!(&self.to_string());
     }

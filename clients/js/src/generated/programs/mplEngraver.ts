@@ -13,22 +13,22 @@ import {
   PublicKey,
 } from '@metaplex-foundation/umi';
 import {
-  getMplEngraverErrorFromCode,
-  getMplEngraverErrorFromName,
+  getMplMplEngraverErrorFromCode,
+  getMplMplEngraverErrorFromName,
 } from '../errors';
 
 export const MPL_ENGRAVER_PROGRAM_ID =
-  'engrutYV21fUN2euLkKKwv3vCuVsHg1pBwfJUtKLmZ5' as PublicKey<'engrutYV21fUN2euLkKKwv3vCuVsHg1pBwfJUtKLmZ5'>;
+  'ENGRVY4DL6uKDnNS91hCkJMwzTfcofYpkZH8zsgJfzA3' as PublicKey<'ENGRVY4DL6uKDnNS91hCkJMwzTfcofYpkZH8zsgJfzA3'>;
 
 export function createMplEngraverProgram(): Program {
   return {
     name: 'mplEngraver',
     publicKey: MPL_ENGRAVER_PROGRAM_ID,
     getErrorFromCode(code: number, cause?: Error) {
-      return getMplEngraverErrorFromCode(code, this, cause);
+      return getMplMplEngraverErrorFromCode(code, this, cause);
     },
     getErrorFromName(name: string, cause?: Error) {
-      return getMplEngraverErrorFromName(name, this, cause);
+      return getMplMplEngraverErrorFromName(name, this, cause);
     },
     isOnCluster() {
       return true;

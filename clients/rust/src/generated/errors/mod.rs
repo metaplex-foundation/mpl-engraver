@@ -7,4 +7,4 @@
 
 pub(crate) mod mpl_engraver;
 
-pub use self::mpl_engraver::MplEngraverError;
+pub use self::mpl_engraver::MplMplEngraverError;
