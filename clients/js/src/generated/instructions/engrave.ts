@@ -93,7 +93,7 @@ export function engrave(
   // Accounts.
   const resolvedAccounts: ResolvedAccountsWithIndices = {
     authority: { index: 0, isWritable: true, value: input.authority ?? null },
-    mint: { index: 1, isWritable: true, value: input.mint ?? null },
+    mint: { index: 1, isWritable: false, value: input.mint ?? null },
     metadata: { index: 2, isWritable: true, value: input.metadata ?? null },
     edition: { index: 3, isWritable: true, value: input.edition ?? null },
     systemProgram: {

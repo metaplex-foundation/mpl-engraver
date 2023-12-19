@@ -41,7 +41,7 @@ impl Engrave {
             self.authority,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             self.mint, false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -269,7 +269,7 @@ impl<'a, 'b> EngraveCpi<'a, 'b> {
             *self.authority.key,
             true,
         ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             *self.mint.key,
             false,
         ));

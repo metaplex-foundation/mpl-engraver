@@ -15,7 +15,7 @@
         },
         {
           "name": "mint",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false,
           "docs": [
             "NFT mint account"
