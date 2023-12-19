@@ -25,6 +25,9 @@ pub enum MplEngraverError {
     /// 4 (0x4) - The edition supply is not zero
     #[error("The edition supply is not zero")]
     EditionSupplyMismatch,
+    /// 5 (0x5) - The derived PDA is not valid
+    #[error("The derived PDA is not valid")]
+    DerivedKeyInvalid,
 }
 
 impl solana_program::program_error::PrintProgramError for MplEngraverError {

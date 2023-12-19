@@ -119,6 +119,11 @@
       "code": 4,
       "name": "EditionSupplyMismatch",
       "msg": "The edition supply is not zero"
+    },
+    {
+      "code": 5,
+      "name": "DerivedKeyInvalid",
+      "msg": "The derived PDA is not valid"
     }
   ],
   "metadata": {

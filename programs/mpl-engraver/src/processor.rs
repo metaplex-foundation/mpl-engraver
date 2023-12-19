@@ -50,26 +50,55 @@ fn process_engrave<'a>(accounts: &'a [AccountInfo<'a>], args: EngraveArgs) -> Pr
             mpl_token_metadata::ID.as_ref(),
             mint_info.key.as_ref(),
         ],
-        MplEngraverError::InvalidAccountOwner,
+        MplEngraverError::DerivedKeyInvalid,
     )?;
+
     assert_derivation(
         &mpl_token_metadata::ID,
-        &metadata_info,
+        &edition_info,
         &[
             "metadata".as_bytes(),
             mpl_token_metadata::ID.as_ref(),
             mint_info.key.as_ref(),
             "edition".as_bytes(),
         ],
-        MplEngraverError::InvalidAccountOwner,
+        MplEngraverError::DerivedKeyInvalid,
     )?;
 
     msg!("Finished common checks.");
 
-    let nft_metadata = Metadata::safe_deserialize(&args.data)?;
+    let nft_metadata = match args.target {
+        EngraveTarget::Metadata => Metadata::safe_deserialize(&args.data)?,
+        EngraveTarget::Edition => {
+            let metadata_data = metadata_info.try_borrow_data()?;
+            Metadata::safe_deserialize(&metadata_data)?
+        }
+    };
     msg!("Deserialized metadata.");
     msg!("metadata: {:?}", nft_metadata);
-    let serialized_data = nft_metadata.try_to_vec()?;
+
+    if nft_metadata.mint != *mint_info.key {
+        return Err(MplEngraverError::MintMetadataMismatch.into());
+    }
+
+    // If the edition is passed in then deserialize and print it.
+    let edition = match args.target {
+        EngraveTarget::Metadata => {
+            let edition_data = edition_info.try_borrow_data()?;
+            MasterEdition::safe_deserialize(&edition_data)?
+        }
+        EngraveTarget::Edition => MasterEdition::safe_deserialize(&args.data)?,
+    };
+
+    msg!("Deserialized edition.");
+    msg!("edition: {:?}", edition);
+
+    if edition.supply != 0 {
+        return Err(MplEngraverError::EditionSupplyMismatch.into());
+    }
+    msg!("Finished relationship checks.");
+
+    // TODO: Checks: The rest of the owl
 
     // The PDAs on Token Metadata derived from the mint, but must be
     // owned by the Engraver program.
@@ -83,8 +112,16 @@ fn process_engrave<'a>(accounts: &'a [AccountInfo<'a>], args: EngraveArgs) -> Pr
                 MplEngraverError::InvalidAccountOwner,
             )?;
             msg!("Engraving metadata...");
+
+            let serialized_data = nft_metadata.try_to_vec()?;
             // Reallocate the metadata account to the correct length.
             metadata_info.realloc(serialized_data.len(), false)?;
+            msg!("Writing metadata under the new owning program...");
+            sol_memcpy(
+                &mut metadata_info.data.borrow_mut(),
+                &serialized_data,
+                serialized_data.len(),
+            );
         }
         EngraveTarget::Edition => {
             msg!("Checking edition is owned by Engraver");
@@ -94,36 +131,11 @@ fn process_engrave<'a>(accounts: &'a [AccountInfo<'a>], args: EngraveArgs) -> Pr
                 MplEngraverError::InvalidAccountOwner,
             )?;
             msg!("Engraving edition...");
+
+            let serialized_data: Vec<u8> = edition.try_to_vec()?;
             // Reallocate the edition account to the correct length.
             edition_info.realloc(serialized_data.len(), false)?;
-        }
-    }
-
-    let edition = MasterEdition::try_from_slice(&edition_info.data.borrow())?;
-    msg!("Deserialized edition.");
-
-    if nft_metadata.mint != *mint_info.key {
-        return Err(MplEngraverError::MintMetadataMismatch.into());
-    }
-    if edition.supply != 0 {
-        return Err(MplEngraverError::EditionSupplyMismatch.into());
-    }
-    msg!("Finished relationship checks.");
-
-    // TODO: Checks: The rest of the owl
-
-    msg!("Writing metadata under the new owning program...");
-
-    // Set the account under the new owner, now it cannot be modified by Token Metadata any more.
-    match args.target {
-        EngraveTarget::Metadata => {
-            sol_memcpy(
-                &mut metadata_info.data.borrow_mut(),
-                &serialized_data,
-                serialized_data.len(),
-            );
-        }
-        EngraveTarget::Edition => {
+            msg!("Writing edition under the new owning program...");
             sol_memcpy(
                 &mut edition_info.data.borrow_mut(),
                 &serialized_data,

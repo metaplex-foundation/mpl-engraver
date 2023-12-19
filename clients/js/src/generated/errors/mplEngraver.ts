@@ -80,6 +80,19 @@ export class EditionSupplyMismatchError extends ProgramError {
 codeToErrorMap.set(0x4, EditionSupplyMismatchError);
 nameToErrorMap.set('EditionSupplyMismatch', EditionSupplyMismatchError);
 
+/** DerivedKeyInvalid: The derived PDA is not valid */
+export class DerivedKeyInvalidError extends ProgramError {
+  readonly name: string = 'DerivedKeyInvalid';
+
+  readonly code: number = 0x5; // 5
+
+  constructor(program: Program, cause?: Error) {
+    super('The derived PDA is not valid', program, cause);
+  }
+}
+codeToErrorMap.set(0x5, DerivedKeyInvalidError);
+nameToErrorMap.set('DerivedKeyInvalid', DerivedKeyInvalidError);
+
 /**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors

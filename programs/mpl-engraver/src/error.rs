@@ -25,6 +25,9 @@ pub enum MplEngraverError {
     /// The edition supply is not zero.
     #[error("The edition supply is not zero")]
     EditionSupplyMismatch = 4,
+    /// The derived PDA is not valid.
+    #[error("The derived PDA is not valid")]
+    DerivedKeyInvalid = 5,
 }
 
 impl PrintProgramError for MplEngraverError {
