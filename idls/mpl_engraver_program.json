@@ -32,7 +32,7 @@
         {
           "name": "edition",
           "isMut": true,
-          "isSigner": false,
+          "isSigner": true,
           "docs": [
             "NFT edition account"
           ]

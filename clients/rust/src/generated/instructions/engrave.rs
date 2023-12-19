@@ -50,7 +50,7 @@ impl Engrave {
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.edition,
-            false,
+            true,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             self.system_program,
@@ -279,7 +279,7 @@ impl<'a, 'b> EngraveCpi<'a, 'b> {
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.edition.key,
-            false,
+            true,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new_readonly(
             *self.system_program.key,

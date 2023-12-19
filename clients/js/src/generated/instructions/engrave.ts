@@ -42,7 +42,7 @@ export type EngraveInstructionAccounts = {
   /** NFT metadata account */
   metadata: PublicKey | Pda;
   /** NFT edition account */
-  edition: PublicKey | Pda;
+  edition: Signer;
   /** System program */
   systemProgram?: PublicKey | Pda;
 };

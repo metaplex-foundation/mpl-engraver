@@ -28,7 +28,7 @@ pub enum EngraverInstruction {
     #[account(0, writable, signer, name="authority", desc = "NFT update authority")]
     #[account(1, name="mint", desc = "NFT mint account")]
     #[account(2, writable, name="metadata", desc = "NFT metadata account")]
-    #[account(3, writable, name="edition", desc = "NFT edition account")]
+    #[account(3, writable, signer, name="edition", desc = "NFT edition account")]
     #[account(4, name="system_program", desc = "System program")]
     Engrave(EngraveArgs),
 }
