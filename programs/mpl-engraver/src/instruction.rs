@@ -27,9 +27,8 @@ pub enum EngraverInstruction {
     /// Write through account data and take ownership.
     #[account(0, writable, signer, name="authority", desc = "NFT update authority")]
     #[account(1, writable, name="mint", desc = "NFT mint account")]
-    #[account(2, writable, name="token", desc = "NFT token account")]
-    #[account(3, writable, name="metadata", desc = "NFT metadata account")]
-    #[account(4, writable, name="edition", desc = "NFT edition account")]
-    #[account(5, name="system_program", desc = "System program")]
+    #[account(2, writable, name="metadata", desc = "NFT metadata account")]
+    #[account(3, writable, name="edition", desc = "NFT edition account")]
+    #[account(4, name="system_program", desc = "System program")]
     Engrave(EngraveArgs),
 }

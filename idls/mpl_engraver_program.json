@@ -22,14 +22,6 @@
           ]
         },
         {
-          "name": "token",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "NFT token account"
-          ]
-        },
-        {
           "name": "metadata",
           "isMut": true,
           "isSigner": false,

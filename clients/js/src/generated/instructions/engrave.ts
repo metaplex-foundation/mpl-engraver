@@ -39,8 +39,6 @@ export type EngraveInstructionAccounts = {
   authority?: Signer;
   /** NFT mint account */
   mint: PublicKey | Pda;
-  /** NFT token account */
-  token: PublicKey | Pda;
   /** NFT metadata account */
   metadata: PublicKey | Pda;
   /** NFT edition account */
@@ -96,11 +94,10 @@ export function engrave(
   const resolvedAccounts: ResolvedAccountsWithIndices = {
     authority: { index: 0, isWritable: true, value: input.authority ?? null },
     mint: { index: 1, isWritable: true, value: input.mint ?? null },
-    token: { index: 2, isWritable: true, value: input.token ?? null },
-    metadata: { index: 3, isWritable: true, value: input.metadata ?? null },
-    edition: { index: 4, isWritable: true, value: input.edition ?? null },
+    metadata: { index: 2, isWritable: true, value: input.metadata ?? null },
+    edition: { index: 3, isWritable: true, value: input.edition ?? null },
     systemProgram: {
-      index: 5,
+      index: 4,
       isWritable: false,
       value: input.systemProgram ?? null,
     },

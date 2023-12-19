@@ -15,8 +15,6 @@ pub struct Engrave {
     pub authority: solana_program::pubkey::Pubkey,
     /// NFT mint account
     pub mint: solana_program::pubkey::Pubkey,
-    /// NFT token account
-    pub token: solana_program::pubkey::Pubkey,
     /// NFT metadata account
     pub metadata: solana_program::pubkey::Pubkey,
     /// NFT edition account
@@ -38,16 +36,13 @@ impl Engrave {
         args: EngraveInstructionArgs,
         remaining_accounts: &[solana_program::instruction::AccountMeta],
     ) -> solana_program::instruction::Instruction {
-        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.authority,
             true,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.mint, false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            self.token, false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             self.metadata,
@@ -97,7 +92,6 @@ pub struct EngraveInstructionArgs {
 pub struct EngraveBuilder {
     authority: Option<solana_program::pubkey::Pubkey>,
     mint: Option<solana_program::pubkey::Pubkey>,
-    token: Option<solana_program::pubkey::Pubkey>,
     metadata: Option<solana_program::pubkey::Pubkey>,
     edition: Option<solana_program::pubkey::Pubkey>,
     system_program: Option<solana_program::pubkey::Pubkey>,
@@ -120,12 +114,6 @@ impl EngraveBuilder {
     #[inline(always)]
     pub fn mint(&mut self, mint: solana_program::pubkey::Pubkey) -> &mut Self {
         self.mint = Some(mint);
-        self
-    }
-    /// NFT token account
-    #[inline(always)]
-    pub fn token(&mut self, token: solana_program::pubkey::Pubkey) -> &mut Self {
-        self.token = Some(token);
         self
     }
     /// NFT metadata account
@@ -180,7 +168,6 @@ impl EngraveBuilder {
         let accounts = Engrave {
             authority: self.authority.expect("authority is not set"),
             mint: self.mint.expect("mint is not set"),
-            token: self.token.expect("token is not set"),
             metadata: self.metadata.expect("metadata is not set"),
             edition: self.edition.expect("edition is not set"),
             system_program: self
@@ -202,8 +189,6 @@ pub struct EngraveCpiAccounts<'a, 'b> {
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
     /// NFT mint account
     pub mint: &'b solana_program::account_info::AccountInfo<'a>,
-    /// NFT token account
-    pub token: &'b solana_program::account_info::AccountInfo<'a>,
     /// NFT metadata account
     pub metadata: &'b solana_program::account_info::AccountInfo<'a>,
     /// NFT edition account
@@ -220,8 +205,6 @@ pub struct EngraveCpi<'a, 'b> {
     pub authority: &'b solana_program::account_info::AccountInfo<'a>,
     /// NFT mint account
     pub mint: &'b solana_program::account_info::AccountInfo<'a>,
-    /// NFT token account
-    pub token: &'b solana_program::account_info::AccountInfo<'a>,
     /// NFT metadata account
     pub metadata: &'b solana_program::account_info::AccountInfo<'a>,
     /// NFT edition account
@@ -242,7 +225,6 @@ impl<'a, 'b> EngraveCpi<'a, 'b> {
             __program: program,
             authority: accounts.authority,
             mint: accounts.mint,
-            token: accounts.token,
             metadata: accounts.metadata,
             edition: accounts.edition,
             system_program: accounts.system_program,
@@ -282,17 +264,13 @@ impl<'a, 'b> EngraveCpi<'a, 'b> {
             bool,
         )],
     ) -> solana_program::entrypoint::ProgramResult {
-        let mut accounts = Vec::with_capacity(6 + remaining_accounts.len());
+        let mut accounts = Vec::with_capacity(5 + remaining_accounts.len());
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.authority.key,
             true,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
             *self.mint.key,
-            false,
-        ));
-        accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.token.key,
             false,
         ));
         accounts.push(solana_program::instruction::AccountMeta::new(
@@ -323,11 +301,10 @@ impl<'a, 'b> EngraveCpi<'a, 'b> {
             accounts,
             data,
         };
-        let mut account_infos = Vec::with_capacity(6 + 1 + remaining_accounts.len());
+        let mut account_infos = Vec::with_capacity(5 + 1 + remaining_accounts.len());
         account_infos.push(self.__program.clone());
         account_infos.push(self.authority.clone());
         account_infos.push(self.mint.clone());
-        account_infos.push(self.token.clone());
         account_infos.push(self.metadata.clone());
         account_infos.push(self.edition.clone());
         account_infos.push(self.system_program.clone());
@@ -354,7 +331,6 @@ impl<'a, 'b> EngraveCpiBuilder<'a, 'b> {
             __program: program,
             authority: None,
             mint: None,
-            token: None,
             metadata: None,
             edition: None,
             system_program: None,
@@ -377,12 +353,6 @@ impl<'a, 'b> EngraveCpiBuilder<'a, 'b> {
     #[inline(always)]
     pub fn mint(&mut self, mint: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
         self.instruction.mint = Some(mint);
-        self
-    }
-    /// NFT token account
-    #[inline(always)]
-    pub fn token(&mut self, token: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
-        self.instruction.token = Some(token);
         self
     }
     /// NFT metadata account
@@ -474,8 +444,6 @@ impl<'a, 'b> EngraveCpiBuilder<'a, 'b> {
 
             mint: self.instruction.mint.expect("mint is not set"),
 
-            token: self.instruction.token.expect("token is not set"),
-
             metadata: self.instruction.metadata.expect("metadata is not set"),
 
             edition: self.instruction.edition.expect("edition is not set"),
@@ -497,7 +465,6 @@ struct EngraveCpiBuilderInstruction<'a, 'b> {
     __program: &'b solana_program::account_info::AccountInfo<'a>,
     authority: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     mint: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-    token: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     metadata: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     edition: Option<&'b solana_program::account_info::AccountInfo<'a>>,
     system_program: Option<&'b solana_program::account_info::AccountInfo<'a>>,

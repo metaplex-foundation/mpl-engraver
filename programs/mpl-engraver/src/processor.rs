@@ -2,9 +2,7 @@ use borsh::{BorshDeserialize, BorshSerialize};
 use mpl_token_metadata::accounts::{MasterEdition, Metadata};
 use mpl_utils::{assert_derivation, assert_owned_by, assert_signer};
 use solana_program::program_memory::sol_memcpy;
-use solana_program::program_pack::Pack;
 use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult, msg, pubkey::Pubkey};
-use spl_token::state::Account as TokenAccount;
 
 use crate::error::MplEngraverError;
 use crate::instruction::accounts::EngraveAccounts;
@@ -31,7 +29,6 @@ fn process_engrave<'a>(accounts: &'a [AccountInfo<'a>], args: EngraveArgs) -> Pr
     msg!("accounts: {:?}", accounts.len());
     let authority_info = ctx.accounts.authority.clone();
     let mint_info = ctx.accounts.mint.clone();
-    let token_info = ctx.accounts.token.clone();
     let metadata_info = ctx.accounts.metadata.clone();
     let edition_info = ctx.accounts.edition.clone();
     let _system_program_info = ctx.accounts.system_program.clone();
@@ -105,14 +102,8 @@ fn process_engrave<'a>(accounts: &'a [AccountInfo<'a>], args: EngraveArgs) -> Pr
     let edition = MasterEdition::try_from_slice(&edition_info.data.borrow())?;
     msg!("Deserialized edition.");
 
-    let token = TokenAccount::unpack(&token_info.data.borrow())?;
-    msg!("Deserialized token.");
-
     if nft_metadata.mint != *mint_info.key {
         return Err(MplEngraverError::MintMetadataMismatch.into());
-    }
-    if token.mint != *mint_info.key {
-        return Err(MplEngraverError::MintTokenMismatch.into());
     }
     if edition.supply != 0 {
         return Err(MplEngraverError::EditionSupplyMismatch.into());
