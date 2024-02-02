@@ -11,12 +11,12 @@ program_common: &program_common
   - ".github/file-filters.yml"
   - ".github/.env"
 
-mpl_engraver_program: &mpl_engraver_program
+mpl_engraver: &mpl_engraver
   - *program_common
-  - "programs/mpl-engraver/**"
+  - "programs/engraver/**"
 
 programs: &programs
-  - *mpl_engraver_program
+  - *mpl_engraver
 
 # Clients.
 

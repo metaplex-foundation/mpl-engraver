@@ -11,5 +11,5 @@ generateIdl({
   programId: "ENGRVY4DL6uKDnNS91hCkJMwzTfcofYpkZH8zsgJfzA3",
   idlDir,
   binaryInstallDir,
-  programDir: path.join(programDir, "mpl-engraver"),
+  programDir: path.join(programDir, "engraver"),
 });
